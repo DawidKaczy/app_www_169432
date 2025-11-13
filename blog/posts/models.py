@@ -1,5 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+import re
+
 
 class Category(models.Model):
     name = models.CharField(max_length=60)
@@ -9,6 +13,7 @@ class Category(models.Model):
 
     class Meta:
         ordering = ['name']
+
 
 class Topic(models.Model):
     name = models.CharField(max_length=60)
@@ -20,6 +25,7 @@ class Topic(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Post(models.Model):
     title = models.CharField(max_length=150)
@@ -35,6 +41,3 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-
-
-

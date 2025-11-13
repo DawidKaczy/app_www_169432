@@ -1,15 +1,21 @@
 from rest_framework import serializers
 from .models import Category, Topic, Post
+import re
 
 class PostSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=150)
     text = serializers.CharField()
-    topic = serializers.PrimaryKeyRelatedField(read_only=True)
+    topic = serializers.PrimaryKeyRelatedField(queryset=Topic.objects.all())
     slug = serializers.SlugField()
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
     created_by = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    def validate_title(self, value):
+        if not re.match(r'^[A-Za-zÀ-Żà-ż\s]+$', value):
+            raise serializers.ValidationError('Tytuł może zawierać tylko litery i spacje.')
+        return value
 
     def create(self, validated_data):
         return Post.objects.create(**validated_data)
@@ -20,8 +26,6 @@ class PostSerializer(serializers.Serializer):
         instance.slug = validated_data.get('slug', instance.slug)
         instance.save()
         return instance
-
-
 
 class CategorySerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
