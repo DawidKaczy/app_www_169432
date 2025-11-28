@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import permission_required
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -5,6 +6,11 @@ from .models import Category, Topic, Post
 from .serializers import CategorySerializer, TopicSerializer, PostSerializer
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
+from django.core.exceptions import PermissionDenied
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import permission_required
+
 
 
 
@@ -189,3 +195,11 @@ class CategoryTopicsList(APIView):
         topics = Topic.objects.filter(category=category)
         serializer = TopicSerializer(topics, many=True)
         return Response(serializer.data)
+
+@permission_required('posts.view_category')
+def category_secure_detail(request, pk):
+    try:
+        category = Category.objects.get(pk=pk)
+        return HttpResponse(f"Kategoria: {category.name}<br>Opis: {category.description}")
+    except Category.DoesNotExist:
+        return HttpResponse(f"Nie znaleziono kategorii o id={pk}.")
