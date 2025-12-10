@@ -1,6 +1,8 @@
 from django.urls import include, path
 from django.contrib import admin
 from debug_toolbar.toolbar import debug_toolbar_urls
+from django.views.decorators.csrf import csrf_exempt
+from graphene_django.views import GraphQLView
 from rest_framework.authtoken import views as drf_auth_views
 from posts import views
 from posts.views import category_secure_detail
@@ -28,4 +30,5 @@ urlpatterns = [
     path('posts/<int:pk>/delete/', views.PostDelete.as_view(), name='post-delete'),
     path('categories/<int:category_id>/topics/', views.CategoryTopicsList.as_view(), name='category-topics'),
     path('secure-category/<int:pk>/', category_secure_detail, name='secure-category-detail'),
+    path("graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ] + debug_toolbar_urls()
